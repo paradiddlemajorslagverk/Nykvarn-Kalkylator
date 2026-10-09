@@ -1,0 +1,1 @@
+# Nykvarn-Kalkylator
