@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tidskalkylator - Nykvarns Kulturskola</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 5px;
+            font-size: 26px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #bdc3c7;
+            margin-bottom: 25px;
+        }
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #7f8c8d;
+            border: none;
+            background: none;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .tab.active {
+            color: #2980b9;
+            border-bottom: 3px solid #2980b9;
+            margin-bottom: -2px;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .day-block {
+            background: #fdfefe;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .day-title {
+            font-size: 18px;
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #edf2f7;
+            padding-bottom: 5px;
+            font-weight: 600;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        th {
+            text-align: left;
+            background-color: #f8fafc;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px;
+        }
+        td {
+            padding: 8px 4px;
+            vertical-align: middle;
+        }
+        .row-title {
+            width: 35%;
+            font-weight: 500;
+            font-size: 14px;
+            color: #334155;
+        }
+        input[type="number"] {
+            width: 80px;
+            padding: 6px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: center;
+        }
+        input[type="number"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        .readonly-time {
+            font-weight: 600;
+            color: #475569;
+            font-size: 14px;
+        }
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        .meta-item label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 5px;
+        }
+        .meta-item input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .summary-box {
+            background: #27ae60;
+            color: white;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        .summary-box h2 {
+            margin: 0 0 10px 0;
+            font-size: 20px;
+        }
+        .summary-box p {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        /* Årsplans-tabell */
+        .budget-table, .cal-table {
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        .budget-table th, .cal-table th {
+            background: #34495e;
+            color: white;
+            padding: 10px;
+        }
+        .budget-table td, .cal-table td {
+            border: 1px solid #e2e8f0;
+            padding: 10px;
+            font-size: 14px;
+        }
+        .p-kurs { background-color: #eef9ff; }
+        .p-lov { background-color: #fff9e6; }
+        .p-sommar { background-color: #e6f9ec; }
+        .p-prod { background-color: #fff0f0; }
+        .p-ovrig { background-color: #f1f5f9; }
+        
+        .print-btn {
+            display: block;
+            width: 200px;
+            margin: 20px auto 0 auto;
+            background: #34495e;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .print-btn:hover { background: #2c3e50; }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; max-width: 100%; }
+            .tabs, .print-btn, input { display: none !important; }
+            .readonly-time { color: black; }
+            .day-block { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Nykvarns Kulturskola</h1>
+    <div class="subtitle">Tjänsteplanering & Arbetstidsfördelning (HT 2025)</div>
+
+    <div class="meta-grid">
+        <div class="meta-item">
+            <label>Lärarens namn:</label>
+            <input type="text" placeholder="Skriv namn...">
+        </div>
+        <div class="meta-item">
+            <label>Tjänstgöringsgrad (%):</label>
+            <input type="number" id="fte" value="100" min="0" max="100">
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab(event, 'tab-weekly')">Veckoplanering (Mån-Fre)</button>
+        <button class="tab" onclick="switchTab(event, 'tab-yearly')">Nykvarns Årsplan (1880 h)</button>
+    </div>
+
+    <!-- FLIK 1: VECKOPLANERING -->
+    <div id="tab-weekly" class="tab-content active">
+        <div id="days-container"></div>
+
+        <!-- ÖVERGRIPANDE BLOCK -->
+        <div class="day-block">
+            <div class="day-title">Övergripande & Långsiktig tid (Vecko-/Månadsbasis)</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="row-title">Aktivitet</th>
+                        <th>Tid (Minuter)</th>
+                        <th>Beräknad tid</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="row-title">Egen övning & instudering av nya stycken</td>
+                        <td><input type="number" class="longterm-input" data-type="direct" value="0" min="0" oninput="calculateTotal()"></td>
+                        <td><span class="readonly-time">-</span></td>
+                    </tr>
+                    <tr>
+                        <td class="row-title">Instrumentvård</td>
+                        <td><input type="number" class="longterm-input" data-type="direct" value="0" min="0" oninput="calculateTotal()"></td>
+                        <td><span class="readonly-time">-</span></td>
+                    </tr>
+                    <tr>
+                        <td class="row-title">APT (Arbetsplatsträff)</td>
+                        <td><input type="number" class="longterm-input" data-type="direct" value="0" min="0" oninput="calculateTotal()"></td>
+                        <td><span class="readonly-time">-</span></td>
+                    </tr>
+                    <tr>
+                        <td class="row-title">Facklig tid</td>
+                        <td><input type="number" class="longterm-input" data-type="direct" value="0" min="0" oninput="calculateTotal()"></td>
+                        <td><span class="readonly-time">-</span></td>
+                    </tr>
+                    <tr>
+                        <td class="row-title">Lovverksamhet (Höst-, sport-, påsk-, sommarlov)</td>
+                        <td><input type="number" class="longterm-input" data-type="direct" value="0" min="0" oninput="calculateTotal()"></td>
+                        <td><span class="readonly-time">-</span></td>
+                    </tr>
+                    <tr>
+                        <td class="row-title">Produktioner & Evenemang (Lucia, Sommarprat etc.)</td>
+                        <td><input type="number" class="longterm-input" data-type="direct" value="0" min="0" oninput="calculateTotal()"></td>
+                        <td><span class="readonly-time">-</span></td>
+                    </tr>
+                    <tr>
+                        <td class="row-title">Övriga uppdrag (t.ex. studielån / projekt)</td>
+                        <td><input type="number" class="longterm-input" data-type="direct" value="0" min="0" oninput="calculateTotal()"></td>
+                        <td><span class="readonly-time">-</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="summary-box">
+            <h2>Total veckoarbetstid</h2>
+            <p><span id="grand-total-hours">0.0</span> timmar</p>
+        </div>
+        <button class="print-btn" onclick="window.print()">Skriv ut underlag / Spara PDF</button>
+    </div>
+
+    <!-- FLIK 2: ÅRSPLAN -->
+    <div id="tab-yearly" class="tab-content">
+        <h3>Årsvis summering (100% tjänst, totalt 1880 h)</h3>
+        <table class="budget-table">
+            <thead>
+                <tr><th>Kategori</th><th>Andel (%)</th><th>Måltid (Timmar)</th></tr>
+            </thead>
+            <tbody>
